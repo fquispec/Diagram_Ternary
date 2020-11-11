@@ -1,0 +1,74 @@
+rm(list = ls())
+library(ggplot2);library(tidyverse);library(zoom)
+setwd("C:/Users/aleja/Desktop/Ternary")
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Grid----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+filename<-"grid.csv";
+gr0<-read.csv(file=filename, header=TRUE, sep = ";", dec = ".");
+gr=gr0
+gridCol=grey(0.5)
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Step 0----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+setwd("C:/Users/aleja/Desktop/plot coda/Plot water and sanitation in R");
+filename<-"coda2_w.csv";
+data<-read.csv(file=filename, header=TRUE, sep = ";", dec = ".");
+setwd("C:/Users/aleja/Desktop/plot coda/Plot water and sanitation in R");
+filename2<-"coda2_s.csv";
+data2<-read.csv(file=filename2, header=TRUE, sep = ";", dec = ".");
+b1=na.omit(data)#water
+b2=na.omit(data2)#sanitation
+pc=19
+col1="red"
+col2="blue"
+ctext1=0.8#size of text(point)
+cpoint1=0.7#size of point
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Step 0----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Urban water
+u1=b1 %>% filter(str_detect(sector, 'U'))
+x1 <- u1[,5:7]
+x1 <-x1/rowSums(x1)
+rowSums(x1)
+name=colnames(x1)
+#grp <- as.integer(u1[,8])
+#ternaryDiag(x1, gridCol = grey(0.6), mcex=tt,
+#            cex = p, pch=pc, col=grp, lwd=ld, text = u1$ID)
+#legend("topleft", legend=unique(u1[,9]), col=cl, pch=pc)
+p1 <- x1[,2] + x1[,3]/2
+p2 <- x1[,3] * sqrt(3)/2
+p=data.frame(u1,p1,p2)
+t0=p %>% filter(str_detect(year, '2000'))
+t1=t0$p1
+t2=t0$p2
+tt0=p %>% filter(str_detect(year, '2019'))
+t3=tt0$p1
+t4=tt0$p2
+#Plot Grid
+library(pgirmess)
+plot(range(rbind(gr[,1],gr[,2])),range(rbind(gr[,3],gr[,4])),
+     frame.plot=FALSE, xaxt="n", yaxt="n",
+     type="n",xlab="",ylab="",xlim=c(0,1),ylim=c(-0.1,0.85))
+Segments(gr,col=gridCol,lty="dashed")
+segments(0,0,1,0)
+segments(0,0,1/2,sqrt(3)/2)
+segments(1/2,sqrt(3)/2,1,0)
+text(0.02, -0.02, name[1],cex=1.2)
+text(0.98,-0.02, name[2],cex=1.2)
+text(0.41, 0.86, name[3],cex=1.2)
+text(gr[1:9,3],gr[1:9,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 2,srt=0)
+text(gr[10:18,3],gr[10:18,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 4,srt=60)
+text(gr[1:9,1],gr[1:9,2],labels=gr[9:1,1]*100,col=gridCol,
+     offset =-0.5,cex = 0.8, pos = 4,srt=120)
+points(t1,t2,col=col1,pch=pc,cex = cpoint1,
+       text(t1,t2,labels=t0$ID,cex = ctext1,offset =0.1,pos = 4))
+points(t3,t4,col=col2,pch=pc,cex = cpoint1,
+       text(t3,t4,labels=tt0$ID,cex = ctext1,offset =0.1, pos = 2))
+legend("topleft", legend=unique(p[,4]), col=c("red","blue"), pch=pc)
+#pos:below(1),left(2),above (3),right(4)  
+#zoom::zoomplot.zoom(xlim=c(0.35,0.65) ,ylim =c(0.6,1))
+zoom::zoomplot.zoom(x=0.5,y=0.9,fact=3.4)
