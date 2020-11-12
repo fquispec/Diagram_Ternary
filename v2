@@ -1,0 +1,190 @@
+rm(list = ls())
+library(ggplot2);library(tidyverse);library(zoom)
+setwd("C:/Users/aleja/Desktop/Ternary")
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Grid----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+filename<-"grid.csv";
+gr0<-read.csv(file=filename, header=TRUE, sep = ";", dec = ".");
+gr=gr0
+gridCol=grey(0.5)
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Step 0----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+setwd("C:/Users/aleja/Desktop/plot coda/Plot water and sanitation in R");
+filename<-"coda2_w.csv";
+data<-read.csv(file=filename, header=TRUE, sep = ";", dec = ".");
+setwd("C:/Users/aleja/Desktop/plot coda/Plot water and sanitation in R");
+filename2<-"coda2_s.csv";
+data2<-read.csv(file=filename2, header=TRUE, sep = ";", dec = ".");
+b1=na.omit(data)#water
+b2=na.omit(data2)#sanitation
+pc=19
+col1="red"
+col2="blue"
+ctext1=0.8#size of text(point)
+cpoint1=0.7#size of point
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Step 1----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Urban water
+u1=b1 %>% filter(str_detect(sector, 'U'))
+x1 <- u1[,5:7]
+x1 <-x1/rowSums(x1)
+rowSums(x1)
+name=colnames(x1)
+p1 <- x1[,2] + x1[,3]/2
+p2 <- x1[,3] * sqrt(3)/2
+p=data.frame(u1,p1,p2)
+t0=p %>% filter(str_detect(year, '2000'));t1=t0$p1;t2=t0$p2
+tt0=p %>% filter(str_detect(year, '2019'));t3=tt0$p1;t4=tt0$p2
+
+#Rural water
+r1=b1 %>% filter(str_detect(sector, 'R'))
+x1_r <- r1[,5:7]
+x1_r <-x1_r/rowSums(x1_r)
+rowSums(x1_r)
+name_r=colnames(x1_r)
+p1_r <- x1_r[,2] + x1_r[,3]/2
+p2_r <- x1_r[,3] * sqrt(3)/2
+p_r=data.frame(r1,p1_r,p2_r)
+t0_r=p_r %>% filter(str_detect(year, '2000'));t1_r=t0_r$p1_r;t2_r=t0_r$p2_r
+tt0_r=p_r %>% filter(str_detect(year, '2019'));t3_r=tt0_r$p1_r;t4_r=tt0_r$p2_r
+
+#Sanitation+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Urban sanitation
+s1=b2 %>% filter(str_detect(sector, 'U'))
+x1_s <- s1[,5:7]
+x1_s <-x1_s/rowSums(x1_s)
+rowSums(x1_s)
+name_s=colnames(x1_s)
+p1_s <- x1_s[,2] + x1_s[,3]/2
+p2_s <- x1_s[,3] * sqrt(3)/2
+p_s=data.frame(s1,p1_s,p2_s)
+t0_s=p_s %>% filter(str_detect(year, '2000'));t1_s=t0_s$p1_s;t2_s=t0_s$p2_s
+tt0_s=p_s %>% filter(str_detect(year, '2019'));t3_s=tt0_s$p1_s;t4_s=tt0_s$p2_s
+
+#Rural sanitation
+r1_s=b1 %>% filter(str_detect(sector, 'R'))
+x1_r_s <- r1_s[,5:7]
+x1_r_s <-x1_r_s/rowSums(x1_r_s)
+rowSums(x1_r_s)
+name_r_s=colnames(x1_r_s)
+p1_r_s <- x1_r_s[,2] + x1_r_s[,3]/2
+p2_r_s <- x1_r_s[,3] * sqrt(3)/2
+p_r_s=data.frame(r1_s,p1_r_s,p2_r_s)
+t0_r_s=p_r_s %>% filter(str_detect(year, '2000'));t1_r_s=t0_r_s$p1_r_s;t2_r_s=t0_r_s$p2_r_s
+tt0_r_s=p_r_s %>% filter(str_detect(year, '2019'));t3_r_s=tt0_r_s$p1_r_s;t4_r_s=tt0_r_s$p2_r_s
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Step 2:Plot water and sanitation----
+library(pgirmess)
+pdf(file="C:/Users/aleja/Desktop/Ternary/xxxx6.pdf",
+    width=8, height=8)#width=8.3, height=11.7
+{par(mfrow=c(2,2),mar= c(0.5,0.5,0.5,0),oma = c(0, 0, 0, 0))
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Urban water
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Plot Grid
+plot(range(rbind(gr[,1],gr[,2])),range(rbind(gr[,3],gr[,4])),
+     frame.plot=FALSE, xaxt="n", yaxt="n",
+     type="n",xlab="",ylab="",xlim=c(0,1),ylim=c(-0.1,0.85))
+Segments(gr,col=gridCol,lty="dashed")
+segments(0,0,1,0)
+segments(0,0,1/2,sqrt(3)/2)
+segments(1/2,sqrt(3)/2,1,0)
+text(0.02, -0.02, name[1],cex=1.2)
+text(0.98,-0.02, name[2],cex=1.2)
+text(0.41, 0.86, name[3],cex=1.2)
+text(gr[1:9,3],gr[1:9,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 2,srt=0)
+text(gr[10:18,3],gr[10:18,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 4,srt=60)
+text(gr[1:9,1],gr[1:9,2],labels=gr[9:1,1]*100,col=gridCol,
+     offset =-0.5,cex = 0.8, pos = 4,srt=120)
+points(t1,t2,col=col1,pch=pc,cex = cpoint1,
+       text(t1,t2,labels=t0$ID,cex = ctext1,offset =0.1,pos = 4))
+points(t3,t4,col=col2,pch=pc,cex = cpoint1,
+       text(t3,t4,labels=tt0$ID,cex = ctext1,offset =0.1, pos = 2))
+legend("topleft", legend=unique(p[,4]), col=c("red","blue"), pch=pc)
+#pos:below(1),left(2),above (3),right(4)  
+#zoom::zoomplot.zoom(xlim=c(0.35,0.65) ,ylim =c(0.6,1))
+#zoom::zoomplot.zoom(x=0.5,y=0.9,fact=3.4)
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Rural water
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Plot grid
+plot(range(rbind(gr[,1],gr[,2])),range(rbind(gr[,3],gr[,4])),
+     frame.plot=FALSE, xaxt="n", yaxt="n",
+     type="n",xlab="",ylab="",xlim=c(0,1),ylim=c(-0.1,0.85))
+Segments(gr,col=gridCol,lty="dashed")
+segments(0,0,1,0)
+segments(0,0,1/2,sqrt(3)/2)
+segments(1/2,sqrt(3)/2,1,0)
+text(0.02, -0.02, name[1],cex=1.2)
+text(0.98,-0.02, name[2],cex=1.2)
+text(0.41, 0.86, name[3],cex=1.2)
+text(gr[1:9,3],gr[1:9,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 2,srt=0)
+text(gr[10:18,3],gr[10:18,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 4,srt=60)
+text(gr[1:9,1],gr[1:9,2],labels=gr[9:1,1]*100,col=gridCol,
+     offset =-0.5,cex = 0.8, pos = 4,srt=120)
+points(t1_r,t2_r,col=col1,pch=pc,cex = cpoint1,
+       text(t1_r,t2_r,labels=t0_r$ID,cex = ctext1,offset =0.1,pos = 4))
+points(t3_r,t4_r,col=col2,pch=pc,cex = cpoint1,
+       text(t3_r,t4_r,labels=tt0_r$ID,cex = ctext1,offset =0.1, pos = 2))
+legend("topleft", legend=unique(p_r[,4]), col=c("red","blue"), pch=pc)
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Urban sanitation
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Plot Grid
+plot(range(rbind(gr[,1],gr[,2])),range(rbind(gr[,3],gr[,4])),
+     frame.plot=FALSE, xaxt="n", yaxt="n",
+     type="n",xlab="",ylab="",xlim=c(0,1),ylim=c(-0.1,0.85))
+Segments(gr,col=gridCol,lty="dashed")
+segments(0,0,1,0)
+segments(0,0,1/2,sqrt(3)/2)
+segments(1/2,sqrt(3)/2,1,0)
+text(0.02, -0.02, name[1],cex=1.2)
+text(0.98,-0.02, name[2],cex=1.2)
+text(0.41, 0.86, name[3],cex=1.2)
+text(gr[1:9,3],gr[1:9,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 2,srt=0)
+text(gr[10:18,3],gr[10:18,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 4,srt=60)
+text(gr[1:9,1],gr[1:9,2],labels=gr[9:1,1]*100,col=gridCol,
+     offset =-0.5,cex = 0.8, pos = 4,srt=120)
+points(t1_s,t2_s,col=col1,pch=pc,cex = cpoint1,
+       text(t1_s,t2_s,labels=t0_s$ID,cex = ctext1,offset =0.1,pos = 4))
+points(t3_s,t4_s,col=col2,pch=pc,cex = cpoint1,
+       text(t3_s,t4_s,labels=tt0_s$ID,cex = ctext1,offset =0.1, pos = 2))
+legend("topleft", legend=unique(p_s[,4]), col=c("red","blue"), pch=pc)
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Rural sanitation
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Plot grid
+plot(range(rbind(gr[,1],gr[,2])),range(rbind(gr[,3],gr[,4])),
+     frame.plot=FALSE, xaxt="n", yaxt="n",
+     type="n",xlab="",ylab="",xlim=c(0,1),ylim=c(-0.1,0.85))
+Segments(gr,col=gridCol,lty="dashed")
+segments(0,0,1,0)
+segments(0,0,1/2,sqrt(3)/2)
+segments(1/2,sqrt(3)/2,1,0)
+text(0.02, -0.02, name[1],cex=1.2)
+text(0.98,-0.02, name[2],cex=1.2)
+text(0.41, 0.86, name[3],cex=1.2)
+text(gr[1:9,3],gr[1:9,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 2,srt=0)
+text(gr[10:18,3],gr[10:18,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 4,srt=60)
+text(gr[1:9,1],gr[1:9,2],labels=gr[9:1,1]*100,col=gridCol,
+     offset =-0.5,cex = 0.8, pos = 4,srt=120)
+points(t1_r_s,t2_r_s,col=col1,pch=pc,cex = cpoint1,
+       text(t1_r_s,t2_r_s,labels=t0_r_s$ID,cex = ctext1,offset =0.1,pos = 4))
+points(t3_r_s,t4_r_s,col=col2,pch=pc,cex = cpoint1,
+       text(t3_r_s,t4_r_s,labels=tt0_r_s$ID,cex = ctext1,offset =0.1, pos = 2))
+legend("topleft", legend=unique(p_r[,4]), col=c("red","blue"), pch=pc)
+par(mfrow=c(1,1))}
+dev.off()
+
