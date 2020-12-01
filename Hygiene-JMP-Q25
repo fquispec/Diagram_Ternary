@@ -1,0 +1,219 @@
+rm(list = ls())
+library(ggplot2);library(tidyverse);library(zoom)
+setwd("C:/Users/aleja/OneDrive/7.0 biplot/world")
+#+++++++++++++++++++++++++++++++++++++++++++++++++++
+file <-"pol.csv";
+pol<-read.csv(file=file, header=TRUE, sep = ";", dec = ".");
+x1=pol$x1;c1=pol$c1;x2=pol$x2;c2=pol$c2;x3=pol$x3
+xf=c(x1,x2,x3)
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Grid----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+filename<-"grid.csv";
+gr0<-read.csv(file=filename, header=TRUE, sep = ";", dec = ".");
+gr=gr0
+gridCol=grey(0.7)
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Step 0----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#setwd("C:/Users/aleja/Desktop/plot coda/Plot water and sanitation in R");
+filename<-"bas.csv";
+data<-read.csv(file=filename, header=TRUE, sep = ";", dec = ".");
+b1=data#water
+pc=19
+col1="red"
+col2="blue"
+ctext1=0.8#size of text(point)
+cpoint1=0.7#size of point
+limx=c(0,1)
+limy=c(-0.1,0.85)
+colnames(b1)
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Step 1----
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+b1
+u1=b1 %>% filter(str_detect(Service.Type, "Hygiene")) %>%
+  filter(str_detect(Residence.Type, "rural")) %>% filter(str_detect(Year, "2017"))
+
+BS=u1 %>% filter(str_detect(Service.level, "Basic service"))
+LS=u1 %>% filter(str_detect(Service.level, "Limited service"))
+NF=u1 %>% filter(str_detect(Service.level, "No handwashing facility"))
+#u1=u1[ ,-c(3,4)] 
+bf=cbind(LS,NF,BS)
+bf[,3] == bf[,12]
+bf[,3] == bf[,21]
+colnames(bf)
+bf1=bf[,c(1:6,7,16,25)]
+colnames(bf1)[7] <- "LS"
+colnames(bf1)[8] <- "NF"
+colnames(bf1)[9] <- "BS"
+
+x1 <- bf1[,7:9]
+rowSums(x1)
+#[x1 == 0] <- 0.001
+x1 <-x1/rowSums(x1)
+rowSums(x1)
+name=colnames(x1)
+p1 <- x1[,2] + x1[,3]/2
+p2 <- x1[,3] * sqrt(3)/2
+p=data.frame(bf1,p1,p2)
+t0=p %>% filter(str_detect(SDG.regions, 'LAC'));t1=t0$p1;t2=t0$p2
+m0=p %>% filter(str_detect(SDG.regions, 'CSA'));m1=m0$p1;m2=m0$p2
+n0=p %>% filter(str_detect(SDG.regions, 'ESEA'));n1=n0$p1;n2=n0$p2
+p0=p %>% filter(str_detect(SDG.regions, 'NAWA'));p1=p0$p1;p2=p0$p2
+q0=p %>% filter(str_detect(SDG.regions, 'Oceania'));q1=q0$p1;q2=q0$p2
+r0=p %>% filter(str_detect(SDG.regions, 'SSA'));r1=r0$p1;r2=r0$p2
+
+library(pgirmess)
+plot(range(rbind(gr[,1],gr[,2])),range(rbind(gr[,3],gr[,4])),
+     frame.plot=FALSE, xaxt="n", yaxt="n",
+     type="n",xlab="",ylab="",xlim=limx,ylim=limy)
+polygon(c(0.1,0.2,0.3),c(0.173,0,0.173),col = gray(0.91))
+polygon(c(0.2,0.3,0.4),c(0.346,0.173,0.346),col = gray(0.91))
+polygon(c(0.3,0.4,0.5),c(0.52,0.346,0.52),col = gray(0.91))
+polygon(c(0.4,0.5,0.6),c(0.693,0.52,0.693),col = gray(0.91))
+polygon(c(0.3,0.4,0.5),c(0.173,0,0.173),col = gray(0.91))
+polygon(c(0.4,0.5,0.6),c(0.346,0.173,0.346),col = gray(0.91))
+polygon(c(0.5,0.6,0.7),c(0.52,0.346,0.52),col = gray(0.91))
+polygon(c(0.5,0.6,0.7),c(0.173,0,0.173),col = gray(0.91))
+polygon(c(0.6,0.7,0.8),c(0.346,0.173,0.346),col = gray(0.91))
+polygon(c(0.7,0.8,0.9),c(0.173,0,0.173),col = gray(0.91))
+cot=gray(0.5)
+cx=1
+text(0.1,0.087,"Q17",col=cot,cex=cx)
+text(0.2,0.115,"Q18",col=cot,cex=cx)
+text(0.3,0.087,"Q19",col=cot,cex=cx)
+text(0.4,0.115,"Q20",col=cot,cex=cx)
+text(0.5,0.087,"Q21",col=cot,cex=cx)
+text(0.6,0.115,"Q22",col=cot,cex=cx)
+text(0.7,0.087,"Q23",col=cot,cex=cx)
+text(0.8,0.115,"Q24",col=cot,cex=cx)
+text(0.9,0.087,"Q25",col=cot,cex=cx)
+text(0.2,0.26,"Q10",col=cot,cex=cx)
+text(0.3,0.289,"Q11",col=cot,cex=cx)
+text(0.4,0.26,"Q12",col=cot,cex=cx)
+text(0.5,0.289,"Q13",col=cot,cex=cx)
+text(0.6,0.26,"Q14",col=cot,cex=cx)
+text(0.7,0.289,"Q15",col=cot,cex=cx)
+text(0.8,0.26,"Q16",col=cot,cex=cx)
+text(0.3,0.433,"Q5",col=cot,cex=cx)
+text(0.4,0.462,"Q6",col=cot,cex=cx)
+text(0.5,0.433,"Q7",col=cot,cex=cx)
+text(0.6,0.462,"Q8",col=cot,cex=cx)
+text(0.7,0.433,"Q9",col=cot,cex=cx)
+text(0.4,0.606,"Q2",col=cot,cex=cx)
+text(0.5,0.635,"Q3",col=cot,cex=cx)
+text(0.6,0.606,"Q4",col=cot,cex=cx)
+text(0.5,0.779,"Q1",col=cot,cex=cx)
+Segments(gr,col=gridCol,lty="dashed")
+segments(0,0,1,0)
+segments(0,0,1/2,sqrt(3)/2)
+segments(1/2,sqrt(3)/2,1,0)
+arrows(0,0.1*sqrt(3),0.1,0.2*sqrt(3))
+arrows(0.9,0.2*sqrt(3),1,0.1*sqrt(3))
+arrows(0.6,-0.01,0.4,-0.01)
+text(0.02, -0.02, name[1],cex=1.2)
+text(0.98,-0.02, name[2],cex=1.2)
+text(0.41, 0.86, name[3],cex=1.2)
+text(gr[1:9,3],gr[1:9,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 2,srt=0)
+text(gr[10:18,3],gr[10:18,4],labels=gr[1:9,1]*100,col=gridCol,
+     offset =0.1,cex = ctext1, pos = 4,srt=60)
+text(gr[1:9,1],gr[1:9,2],labels=gr[9:1,1]*100,col=gridCol,
+     offset =-0.5,cex = 0.8, pos = 4,srt=120)
+points(t1,t2,col="blue",pch=pc,cex = cpoint1,
+       text(t1,t2,labels=t0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+points(m1,m2,col=grey(0.5),pch=pc,cex = cpoint1,
+       text(m1,m2,labels=m0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+points(n1,n2,col="cyan3",pch=pc,cex = cpoint1,
+       text(n1,n2,labels=n0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+points(p1,p2,col="orange",pch=pc,cex = cpoint1,
+       text(p1,p2,labels=p0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+points(q1,q2,col="black",pch=pc,cex = cpoint1,
+       text(q1,q2,labels=q0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+points(r1,r2,col="red",pch=pc,cex = cpoint1,
+       text(r1,r2,labels=r0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+legend("topleft", legend=c(xf),ncol=3,cex=0.45,xjust=1,yjust=1)
+legend("topright", legend=c("LAC","CSA","ESEA","NAWA","Oceania","SSA"),
+       col=c("blue",grey(0.5),"cyan3","orange","black","red"),pch=pc,cex=0.5)#,box.lty=0
+
+pdf(file="C:/Users/aleja/OneDrive/7.0 biplot/world/JMP2-Q25-world-Ruralv2.pdf",
+    width=8.3, height=9)#width=8.3, height=11.7
+{par(mfrow=c(1,1),mar= c(0,0,0.5,0.5))
+  plot(range(rbind(gr[,1],gr[,2])),range(rbind(gr[,3],gr[,4])),
+       frame.plot=FALSE, xaxt="n", yaxt="n",
+       type="n",xlab="",ylab="",xlim=limx,ylim=limy)
+  polygon(c(0.1,0.2,0.3),c(0.173,0,0.173),col = gray(0.91))
+  polygon(c(0.2,0.3,0.4),c(0.346,0.173,0.346),col = gray(0.91))
+  polygon(c(0.3,0.4,0.5),c(0.52,0.346,0.52),col = gray(0.91))
+  polygon(c(0.4,0.5,0.6),c(0.693,0.52,0.693),col = gray(0.91))
+  polygon(c(0.3,0.4,0.5),c(0.173,0,0.173),col = gray(0.91))
+  polygon(c(0.4,0.5,0.6),c(0.346,0.173,0.346),col = gray(0.91))
+  polygon(c(0.5,0.6,0.7),c(0.52,0.346,0.52),col = gray(0.91))
+  polygon(c(0.5,0.6,0.7),c(0.173,0,0.173),col = gray(0.91))
+  polygon(c(0.6,0.7,0.8),c(0.346,0.173,0.346),col = gray(0.91))
+  polygon(c(0.7,0.8,0.9),c(0.173,0,0.173),col = gray(0.91))
+  cot=gray(0.5)
+  cx=1
+  text(0.1,0.087,"Q17",col=cot,cex=cx)
+  text(0.2,0.115,"Q18",col=cot,cex=cx)
+  text(0.3,0.087,"Q19",col=cot,cex=cx)
+  text(0.4,0.115,"Q20",col=cot,cex=cx)
+  text(0.5,0.087,"Q21",col=cot,cex=cx)
+  text(0.6,0.115,"Q22",col=cot,cex=cx)
+  text(0.7,0.087,"Q23",col=cot,cex=cx)
+  text(0.8,0.115,"Q24",col=cot,cex=cx)
+  text(0.9,0.087,"Q25",col=cot,cex=cx)
+  text(0.2,0.26,"Q10",col=cot,cex=cx)
+  text(0.3,0.289,"Q11",col=cot,cex=cx)
+  text(0.4,0.26,"Q12",col=cot,cex=cx)
+  text(0.5,0.289,"Q13",col=cot,cex=cx)
+  text(0.6,0.26,"Q14",col=cot,cex=cx)
+  text(0.7,0.289,"Q15",col=cot,cex=cx)
+  text(0.8,0.26,"Q16",col=cot,cex=cx)
+  text(0.3,0.433,"Q5",col=cot,cex=cx)
+  text(0.4,0.462,"Q6",col=cot,cex=cx)
+  text(0.5,0.433,"Q7",col=cot,cex=cx)
+  text(0.6,0.462,"Q8",col=cot,cex=cx)
+  text(0.7,0.433,"Q9",col=cot,cex=cx)
+  text(0.4,0.606,"Q2",col=cot,cex=cx)
+  text(0.5,0.635,"Q3",col=cot,cex=cx)
+  text(0.6,0.606,"Q4",col=cot,cex=cx)
+  text(0.5,0.779,"Q1",col=cot,cex=cx)
+  Segments(gr,col=gridCol,lty="dashed")
+  segments(0,0,1,0)
+  segments(0,0,1/2,sqrt(3)/2)
+  segments(1/2,sqrt(3)/2,1,0)
+  arrows(0,0.1*sqrt(3),0.1,0.2*sqrt(3))
+  arrows(0.9,0.2*sqrt(3),1,0.1*sqrt(3))
+  arrows(0.6,-0.01,0.4,-0.01)
+  text(0.02, -0.02, name[1],cex=1.2)
+  text(0.98,-0.02, name[2],cex=1.2)
+  text(0.41, 0.86, name[3],cex=1.2)
+  text(gr[1:9,3],gr[1:9,4],labels=gr[1:9,1]*100,col=gridCol,
+       offset =0.1,cex = ctext1, pos = 2,srt=0)
+  text(gr[10:18,3],gr[10:18,4],labels=gr[1:9,1]*100,col=gridCol,
+       offset =0.1,cex = ctext1, pos = 4,srt=60)
+  text(gr[1:9,1],gr[1:9,2],labels=gr[9:1,1]*100,col=gridCol,
+       offset =-0.5,cex = 0.8, pos = 4,srt=120)
+  points(t1,t2,col="blue",pch=pc,cex = cpoint1,
+         text(t1,t2,labels=t0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+  points(m1,m2,col=grey(0.5),pch=pc,cex = cpoint1,
+         text(m1,m2,labels=m0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+  points(n1,n2,col="cyan3",pch=pc,cex = cpoint1,
+         text(n1,n2,labels=n0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+  points(p1,p2,col="orange",pch=pc,cex = cpoint1,
+         text(p1,p2,labels=p0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+  points(q1,q2,col="black",pch=pc,cex = cpoint1,
+         text(q1,q2,labels=q0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+  points(r1,r2,col="red",pch=pc,cex = cpoint1,
+         text(r1,r2,labels=r0$Country,cex = ctext1,offset =0.1, pos = 4))#pos=2
+  legend("topleft", legend=c(xf),ncol=3,cex=0.55)
+  legend("topright", legend=c("LAC","CSA","ESEA","NAWA","Oceania","SSA"),
+         col=c("blue",grey(0.5),"cyan3","orange","black","red"),pch=pc,cex=0.75)#,box.lty=0
+  par(mfrow=c(1,1))}
+dev.off()
+
+
+
